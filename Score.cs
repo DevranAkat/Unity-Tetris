@@ -68,8 +68,6 @@ public class Score : MonoBehaviour
 
     public void GetHiScore()
     {
-        PlayerPrefs.DeleteAll();
-
         var hiscoreFirst = PlayerPrefs.GetInt("HiscoreFirst");
         var hiscoreSecond = PlayerPrefs.GetInt("HiscoreSecond");
         var hiscoreThird = PlayerPrefs.GetInt("HiscoreThird");
