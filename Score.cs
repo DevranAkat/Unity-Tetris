@@ -44,7 +44,6 @@ public class Score : MonoBehaviour
         {
             setNewHiscore(score);
         }
-    
     }
 
     public void setNewHiscore(int newHiscore)
@@ -69,7 +68,8 @@ public class Score : MonoBehaviour
 
     public void GetHiScore()
     {
-        // SetHiScore();
+        PlayerPrefs.DeleteAll();
+
         var hiscoreFirst = PlayerPrefs.GetInt("HiscoreFirst");
         var hiscoreSecond = PlayerPrefs.GetInt("HiscoreSecond");
         var hiscoreThird = PlayerPrefs.GetInt("HiscoreThird");
@@ -78,6 +78,5 @@ public class Score : MonoBehaviour
         hiScorePanel.text = "1. " + hiscoreFirst + "\n" + 
                             "2. " + hiscoreSecond + "\n" + 
                             "3. " + hiscoreThird;
-        
     }
 }

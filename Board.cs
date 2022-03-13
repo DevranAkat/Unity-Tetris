@@ -210,4 +210,9 @@ public class Board : MonoBehaviour
         SceneManager.LoadScene("Game"); 
     }
 
+    public void BackToMainMenu()
+    {
+        SceneManager.LoadScene("Menu");
+    }
+
 }
