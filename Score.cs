@@ -35,7 +35,7 @@ public class Score : MonoBehaviour
         boardScore.text = "Score: " + this.totalScore.ToString();
     }
 
-    public void UpdateHiscore()
+    public bool UpdateHiscore()
     {
         var score = totalScore;
         var thirdHiscore = PlayerPrefs.GetInt("HiscoreThird");
@@ -43,7 +43,9 @@ public class Score : MonoBehaviour
         if (score > thirdHiscore)
         {
             setNewHiscore(score);
+            return true;
         }
+        return false;
     }
 
     public void setNewHiscore(int newHiscore)

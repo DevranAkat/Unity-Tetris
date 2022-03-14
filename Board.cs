@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
+using TMPro;
 
 public class Board : MonoBehaviour
 {
@@ -16,6 +17,7 @@ public class Board : MonoBehaviour
     public Vector3Int spawnPosition;
     public Queue<TetrominoData> queue { get; private set; }
     public GameObject gameoverPanel;
+    [SerializeField] GameObject newHiscoreText;
     
     public Vector2Int boardSize = new Vector2Int(10, 20);
     private bool gameOver = false;
@@ -33,7 +35,7 @@ public class Board : MonoBehaviour
         this.tilemap = GetComponentInChildren<Tilemap>();
         this.activePiece = GetComponentInChildren<Piece>();
         this.nextPiece = GetComponentInChildren<NextPiece>();
-        this.nextPiece2 = GetComponentInChildren<NextPiece>();
+        // this.nextPiece2 = GetComponentInChildren<NextPiece>();
         this.Score = GetComponentInChildren<Score>();
         this.LevelManager = GetComponentInChildren<LevelManager>();
         this.queue = new Queue<TetrominoData>();
@@ -72,11 +74,11 @@ public class Board : MonoBehaviour
 
         var newPiece = this.queue.Dequeue();
         var peekNextPiece = this.queue.Peek();
-        var peekSecondNextPiece = this.queue.ElementAt(1);
+        // var peekSecondNextPiece = this.queue.ElementAt(1);
 
         this.activePiece.Initialize(this, this.spawnPosition, newPiece, LevelManager.levelSpeed);
         this.nextPiece.Initialize(this, peekNextPiece, 1);
-        this.nextPiece2.Initialize(this, peekSecondNextPiece, 2);
+        // this.nextPiece2.Initialize(this, peekSecondNextPiece, 2);
 
         if (!IsValidPosition(this.activePiece, this.spawnPosition)) {
             GameOver();
@@ -195,14 +197,19 @@ public class Board : MonoBehaviour
     {
         gameOver = true;
 
-        // this.tilemap.ClearAllTiles();
-
         if (gameoverPanel != null)
         {
-            Score.UpdateHiscore();
+            var newHiscore = Score.UpdateHiscore();
             gameoverPanel.SetActive (true);
+
+            var hiScorePanel = newHiscoreText.GetComponent<TextMeshProUGUI>();
+            hiScorePanel.text = "SCORE: " + Score.totalScore + "\n";
+
+            if(newHiscore){
+                hiScorePanel.text += "New HiScore!";
+            }
+
         }
-        // Do anything else you want on game over here..
     }
 
     public void NewGame()
@@ -214,5 +221,4 @@ public class Board : MonoBehaviour
     {
         SceneManager.LoadScene("Menu");
     }
-
 }
