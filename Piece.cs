@@ -14,6 +14,10 @@ public class Piece : MonoBehaviour
     public float moveDelay = 0.1f;
     public float lockDelay = 0.5f;
 
+    public double screenLeftSide = Screen.width*0.333;
+    public double screenRightSide = Screen.width - (Screen.width*0.333);
+    public double screenBottomSide = Screen.height/5; 
+
     private float stepTime;
     private float moveTime;
     private float lockTime;
@@ -46,6 +50,55 @@ public class Piece : MonoBehaviour
         this.board.ClearPieceFromBoard(this);
         this.lockTime += Time.deltaTime;
 
+        //TODO: Remove, just used to test on PC
+        if (Input.GetButtonDown("Fire1"))
+        {
+            Vector3 mousePos = Input.mousePosition;
+
+            if (mousePos.y < screenBottomSide)
+            {
+                Move(Vector2Int.down);
+            }
+            else if (mousePos.x <= screenLeftSide)
+            {
+                Move(Vector2Int.left);
+            }
+            else if (mousePos.x >= screenRightSide)
+            {
+                Move(Vector2Int.right);
+            }
+            else if(mousePos.x > screenLeftSide && mousePos.x < screenRightSide)
+            {
+                Rotate(1);
+            }
+        }
+
+        if (Input.touchCount > 0)
+        {
+            var touch = Input.GetTouch(0);
+
+            if (touch.position.y < screenBottomSide)
+            {
+                Move(Vector2Int.down);
+            }
+            else if (touch.position.x <= screenLeftSide)
+            {
+                Move(Vector2Int.left);
+            }
+            else if (touch.position.x >= screenRightSide)
+            {
+                Move(Vector2Int.right);
+            }
+            else if(touch.position.x > screenLeftSide && touch.position.x < screenRightSide)
+            {
+                Rotate(1);
+            }
+        } 
+
+        //TODO: Add swipe-control
+
+
+        //TODO: Remove this part, PC input
         if(Input.GetKeyDown(KeyCode.RightArrow)){
             Move(Vector2Int.right);
         }
@@ -58,7 +111,6 @@ public class Piece : MonoBehaviour
         else if(Input.GetKeyDown(KeyCode.UpArrow)){
             Rotate(1);
         }
-
         else if(Input.GetKeyDown(KeyCode.Space)){
             HardDrop();
         }
