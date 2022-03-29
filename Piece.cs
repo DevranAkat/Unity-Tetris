@@ -23,6 +23,16 @@ public class Piece : MonoBehaviour
     private float lockTime;
     private float levelSpeed;
 
+    // If the touch is longer than MAX_SWIPE_TIME, we dont consider it a swipe
+	public const float MAX_SWIPE_TIME = 0.5f; 
+	
+	// Factor of the screen width that we consider a swipe
+	// 0.17 works well for portrait mode 16:9 phone
+	public const float MIN_SWIPE_DISTANCE = 0.17f;
+
+	Vector2 startPos;
+	float startTime;
+
 
     public void Initialize(Board board, Vector3Int position, TetrominoData data, float speedLevel)
     {
@@ -50,75 +60,67 @@ public class Piece : MonoBehaviour
         this.board.ClearPieceFromBoard(this);
         this.lockTime += Time.deltaTime;
 
-        //TODO: Remove, just used to test on PC
-        if (Input.GetButtonDown("Fire1"))
-        {
-            Vector3 mousePos = Input.mousePosition;
+		if(Input.touches.Length > 0)
+		{
+			Touch t = Input.GetTouch(0);
+			if(t.phase == TouchPhase.Began)
+			{
+				startPos = new Vector2(t.position.x/(float)Screen.width, t.position.y/(float)Screen.width);
+				startTime = Time.time;
+			}
+			if(t.phase == TouchPhase.Ended)
+			{
+				if (Time.time - startTime > MAX_SWIPE_TIME) // press too long
+					return;
 
-            if (mousePos.y < screenBottomSide)
-            {
-                Move(Vector2Int.down);
-            }
-            else if (mousePos.x <= screenLeftSide)
-            {
-                Move(Vector2Int.left);
-            }
-            else if (mousePos.x >= screenRightSide)
-            {
-                Move(Vector2Int.right);
-            }
-            else if(mousePos.x > screenLeftSide && mousePos.x < screenRightSide)
-            {
-                Rotate(1);
-            }
-        }
+				Vector2 endPos = new Vector2(t.position.x/(float)Screen.width, t.position.y/(float)Screen.width);
 
-        if (Input.touchCount > 0)
-        {
-            var touch = Input.GetTouch(0);
+				Vector2 swipe = new Vector2(endPos.x - startPos.x, endPos.y - startPos.y);
 
-            if (touch.position.y < screenBottomSide)
-            {
-                Move(Vector2Int.down);
-            }
-            else if (touch.position.x <= screenLeftSide)
-            {
-                Move(Vector2Int.left);
-            }
-            else if (touch.position.x >= screenRightSide)
-            {
-                Move(Vector2Int.right);
-            }
-            else if(touch.position.x > screenLeftSide && touch.position.x < screenRightSide)
-            {
-                Rotate(1);
-            }
-        } 
+				if (swipe.magnitude < MIN_SWIPE_DISTANCE) // Too short swipe
+                {
+                    if (t.position.y < screenBottomSide)
+                    {
+                        Move(Vector2Int.down);
+                    }
+                    else if (t.position.x <= screenLeftSide)
+                    {
+                        Move(Vector2Int.left);
+                    }
+                    else if (t.position.x >= screenRightSide)
+                    {
+                        Move(Vector2Int.right);
+                    }
+                    else if(t.position.x > screenLeftSide && t.position.x < screenRightSide)
+                    {
+                        Rotate(1);
+                    }   
+                    return;  
+                }
 
-        //TODO: Add swipe-control
-
-
-        //TODO: Remove this part, PC input
-        if(Input.GetKeyDown(KeyCode.RightArrow)){
-            Move(Vector2Int.right);
-        }
-        else if(Input.GetKeyDown(KeyCode.LeftArrow)){
-            Move(Vector2Int.left);
-        }
-        else if(Input.GetKeyDown(KeyCode.DownArrow)){
-            Move(Vector2Int.down);
-        }
-        else if(Input.GetKeyDown(KeyCode.UpArrow)){
-            Rotate(1);
-        }
-        else if(Input.GetKeyDown(KeyCode.Space)){
-            HardDrop();
-        }
+				if (Mathf.Abs (swipe.x) > Mathf.Abs (swipe.y)) { // Horizontal swipe
+					if (swipe.x > 0) {
+                        Move(Vector2Int.right);
+					}
+					else {
+                        Move(Vector2Int.left);
+					}
+				}
+				else { // Vertical swipe
+					if (swipe.y > 0) {
+                        Rotate(1);
+					}
+					else {
+                        Move(Vector2Int.down);
+					}
+				}
+			}
+		}
 
         // Allow the player to hold movement keys but only after a move delay
         // so it does not move too fast
         if (Time.time > this.moveTime) {
-            HandleMoveInputs();
+            // HandleMoveInputs();
         }
 
         // Advance the piece to the next row every x seconds
